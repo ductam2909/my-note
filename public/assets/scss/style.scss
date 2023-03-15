@@ -389,20 +389,37 @@ body {
     width: 100%;
   }
 }
+
+.noti {
+  // width: 300px;
+  // height: 500px;
+  position: fixed;
+  z-index: 1;
+  bottom: 10px;
+  left: 0;
+  animation-name: example;
+  animation-duration: 300ms;
+}
+@keyframes example {
+  0%   { left:-600px; bottom:10px;}
+  100% {   left:0px; bottom:10px;}
+}
+
 .notification {
   font-family: "Google Sans",Roboto,Arial,sans-serif;
-  position: relative;
+  // position: absolute;
+  // z-index: 1;
+  // bottom: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background-color: #323232;
-  width: 30%;
+  width: 100%;
   color: #fff;
   margin: 20px;
   padding: 20px 40px;
   border-radius: 10px;
-  animation-name: example;
-  animation-duration: 250ms;
+ 
   
   p {
     color: #F3B302;
@@ -418,11 +435,6 @@ body {
     gap: 10px 30px;
   }
 
-}
-
-@keyframes example {
-  0%   { left:-300px; top:0px;}
-  100% {   left:0px; top:0px;}
 }
 
 .datePicker {

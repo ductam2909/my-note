@@ -1,4 +1,4 @@
-import { Col, Row, Space, DatePicker} from 'antd'
+import { Col, Row, Space, DatePicker } from 'antd'
 import { Icon } from '@iconify/react'
 import React, { useEffect, useState } from 'react'
 import Masonry from 'react-masonry-css'
@@ -28,6 +28,20 @@ export default function Notes() {
     700: 2,
     500: 1
   }
+  const [notefi, setNotefi] = useState()
+
+  const getNotifi = () => {
+    axios.get('http://localhost:8080/demo_01/notification')
+      .then((res) => {
+        setNotefi(res?.data?._embedded)
+      })
+      .catch()
+  }
+
+
+  const callNoti = (childData) => {
+    setNotefi(childData)
+  }
 
   const getNotes = () => {
     axios.get('http://localhost:8080/demo_01/notes')
@@ -41,6 +55,7 @@ export default function Notes() {
 
   useEffect(() => {
     getNotes()
+    getNotifi()
   }, [])
 
   const Renderaction = (props) => {
@@ -67,23 +82,24 @@ export default function Notes() {
       })
     }
 
+
+
     const onChange = (value, dateString) => {
       console.log('Selected Time: ', value);
       console.log('Formatted Selected Time: ', dateString);
     };
-    
+
     const onOk = (value) => {
       var s = Date.parse(value?.$d)
-      axios.post('http://localhost:8080/demo_01/notification', { 'time': s, 'status': "no" }).then((res) => {
+      axios.post('http://localhost:8080/demo_01/notification', { 'idNote': props?.id, 'time': s, 'status': "no" }).then((res) => {
         toast.success('Thêm mới thành công')
-        getNotes()
+        getNotifi()
         // closeForm()
       }).catch((res) => {
         console.log(res)
       })
-      setTimes(s)
+      // setTimes(s)
     };
-  
 
     const [display, setDisplay] = useState(false)
     return (
@@ -91,10 +107,10 @@ export default function Notes() {
         <div className='note-acction'>
           <Space>
             <div className='note-acction-info centered'>
-            <label>
-              <Icon icon='ic:outline-notification-add' color='#5f6368' width='20' />
-              <p>Nhắc tôi</p>
-              <DatePicker showTime onChange={onChange} onOk={onOk}  className='datePicker'/>
+              <label>
+                <Icon icon='ic:outline-notification-add' color='#5f6368' width='20' />
+                <p>Nhắc tôi</p>
+                <DatePicker showTime onChange={onChange} onOk={onOk} className='datePicker' />
               </label>
             </div>
             <div className='note-acction-info centered'>
@@ -181,6 +197,13 @@ export default function Notes() {
         </Masonry>
         {!isModalOpen && <Edit Callback={handleOk} ids={id} />}
       </div>
+      {/* {renderNotifi()} */}
+      <Row>
+        <Col className='noti' span={12}>
+            <Notification noti={notefi} parentCallback={callNoti} />
+        </Col>
+      </Row>
+
     </>
   )
 }
