@@ -1,4 +1,4 @@
-import { Col, Row, Space, DatePicker} from 'antd'
+import { Col, Row, Space, DatePicker } from 'antd'
 import { Icon } from '@iconify/react'
 import React, { useEffect, useState } from 'react'
 import Masonry from 'react-masonry-css'
@@ -9,6 +9,7 @@ import { toast } from 'react-toastify'
 import Edit from './Edit'
 import Cookies from 'universal-cookie'
 import Notification from '../notifcation/Notification'
+import moment from 'moment/moment'
 
 export default function Notes() {
   const cookies = new Cookies()
@@ -28,13 +29,14 @@ export default function Notes() {
     700: 2,
     500: 1
   }
+  const callNoti = (childData) => {
+    setNotes(childData)
+  }
 
   const getNotes = () => {
     axios.get('http://localhost:8080/demo_01/notes')
       .then((res) => {
         setNotes(res?.data?._embedded)
-        // if(res?.data?._embedded?.idUser===tokenUser) {alert('ok')}
-        // (res?.)
       })
       .catch()
   }
@@ -67,34 +69,33 @@ export default function Notes() {
       })
     }
 
+
+
     const onChange = (value, dateString) => {
       console.log('Selected Time: ', value);
       console.log('Formatted Selected Time: ', dateString);
     };
-    
+
     const onOk = (value) => {
       var s = Date.parse(value?.$d)
-      axios.post('http://localhost:8080/demo_01/notification', { 'time': s, 'status': "no" }).then((res) => {
+      axios.patch(`http://localhost:8080/demo_01/notes/${props?.id}`, {'time': s, 'status': "no" }).then((res) => {
         toast.success('Thêm mới thành công')
         getNotes()
-        // closeForm()
       }).catch((res) => {
         console.log(res)
       })
-      setTimes(s)
     };
-  
 
     const [display, setDisplay] = useState(false)
     return (
       <div style={{ position: 'relative' }}>
-        <div className='note-acction'>
+        <div className='note-acction note-acction-hide'>
           <Space>
             <div className='note-acction-info centered'>
-            <label>
-              <Icon icon='ic:outline-notification-add' color='#5f6368' width='20' />
-              <p>Nhắc tôi</p>
-              <DatePicker showTime onChange={onChange} onOk={onOk}  className='datePicker'/>
+              <label>
+                <Icon icon='ic:outline-notification-add' color='#5f6368' width='20' />
+                <p>Nhắc tôi</p>
+                <DatePicker showTime onChange={onChange} onOk={onOk} className='datePicker' />
               </label>
             </div>
             <div className='note-acction-info centered'>
@@ -129,6 +130,20 @@ export default function Notes() {
     return (
       (notes || []).map((item) => {
         if (item?.idUser === tokenUser) {
+            var now = moment(parseInt(item?.time?.$numberLong)).format('L LT');
+          const RenderTime=()=>{
+            if(item?.status=='yes') 
+            return <div className='clock'>
+              <Icon icon="ic:round-access-time" color="#afafaf" width="20" />
+              <p style={{textDecoration:'line-through'}}>{now}</p>
+            </div>
+            else if(item?.status=='no')
+            return <div className='clock'>
+              <Icon icon="ic:round-access-time" color="#afafaf" width="20" />
+              <p>{now}</p>
+            </div>
+            else return <></>
+          }
           return (
             <div key={item._id?.$oid}>
               <div className='note-item'>
@@ -140,6 +155,7 @@ export default function Notes() {
                     <p className='note-info-title'>{item?.title}</p>
                     <p>{item?.description}</p>
                   </div>
+                   <RenderTime />
                 </div>
                 <Renderaction id={item?._id?.$oid} />
               </div>
@@ -181,6 +197,13 @@ export default function Notes() {
         </Masonry>
         {!isModalOpen && <Edit Callback={handleOk} ids={id} />}
       </div>
+      {/* {renderNotifi()} */}
+      <Row>
+        <Col className='noti' span={12}>
+            <Notification noti={notes} parentCallback={callNoti} />
+        </Col>
+      </Row>
+
     </>
   )
 }

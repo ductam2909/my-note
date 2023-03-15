@@ -17,7 +17,9 @@ export default function layout (props) {
       .then((res) => {
         console.log(res)
       })
-      .catch()
+      .catch((error)=>{
+        console.log(error)
+      })
   }
 
   useEffect(() => {
