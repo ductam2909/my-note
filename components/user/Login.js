@@ -1,85 +1,69 @@
-import { Button, Checkbox, Form, Input } from 'antd'
 import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { post } from 'jquery'
 import { useRouter } from 'next/router'
+import React, { use } from 'react'
+import { useEffect, useState } from 'react'
+const host = 'http://localhost:8080'
+import { useForm } from "react-hook-form";
+import { toast } from 'react-toastify'  
 import Cookies from 'universal-cookie'
-import { toast } from 'react-toastify'
 
-const url = 'http://localhost:8080/demo_01/user/'
-const cookies = new Cookies()
-
-export default function Login () {
+export default function Login() {
+  const cookies = new Cookies()
+  const [user,setUser] = useState();
   const route = useRouter()
-  const onFinish = (values) => {
-    axios.get(url).then((res) => {
-      console.log(res?.data?._embedded)
-      res?.data?._embedded.map((s) => {
-        if (values?.username === s?.username && values?.password === s?.password) {
-          toast.success('đăng nhập thành công')
-          cookies.set('tokenUser', s._id?.$oid, { path: '/' })
-          route.push('/')
-        }
-        // if (values?.username === s?.username && values?.password !== s?.password) {
-        //   alert('sai mk')
-        // }
-      })
+  const { register, handleSubmit } = useForm();
+  const onSubmit = data => {
+    const s = user?.filter((item)=>item?.email===data?.email)
+    if(s.length===0){
+      toast.warning("Tài khoản Không tồn tại")
     }
-    ).catch((res) => {
-      console.log(res?.Success)
+    else {
+    s.map((s)=>{
+     if(data?.password===s?.password) {
+      cookies.set('tokenUser', s._id?.$oid, { path: '/' })
+      route.push('/')
+      toast.success('Đăng nhập thành công')
+     }
+     else toast.error('sai mật khẩu')
+    })
+    }
+  }
+
+  const getUser = () => {
+    axios.get(`${host}/demo_01/user`).
+    then((res)=>{
+      console.log(res?.data?._embedded);
+      setUser(res?.data?._embedded)
     })
   }
 
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo)
-  }
+  useEffect(()=>{
+    getUser()
+  },[])
 
   return (
-    <div className='login'>
-      <div className='login-form'>
-        <h2 style={{ textAlign: 'center' }}>Login</h2>
-        <Form
-          initialValues={{
-            remember: true
-          }}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-          autoComplete='off'
-        >
-          <p>Email</p>
-          <Form.Item
-            name='username'
-            rules={[
-              {
-                required: true,
-                message: 'Nhập tên đăng nhâp!'
-              }
-            ]}
-          >
-            <Input type='email' placeholder='nhập email' style={{ width: '100%' }} className='login-input' />
-          </Form.Item>
-          <p>Password</p>
-          <Form.Item
-            name='password'
-            rules={[
-              {
-                required: true,
-                message: 'Nhập mật khẩu!'
-              }
-            ]}
-          >
-            <Input type='password' className='login-input' placeholder='nhập mật khẩu' />
-          </Form.Item>
-
-          <Form.Item
-            style={{ marginTop: '10px' }}
-          >
-            <Button className='login-btnsubmit' type='primary' htmlType='submit'>
-              Đăng nhập
-            </Button>
-          </Form.Item>
-          <p>Chưa có tài khoản?<span className='login-form-link' onClick={() => route.push('/registration')}> Đăng kí</span></p>
-        </Form>
-      </div>
-    </div>
+        <div className='login'>
+          <form className='login-form' onSubmit={handleSubmit(onSubmit)}>
+            <h3 className="text-center">Đăng Nhập</h3>
+            <p>Email </p>
+            <input type="email" 
+            placeholder="Email"
+            {...register("email")}
+            required 
+            />
+            <p>Mật khẩu</p>
+            <input type="password" 
+            minLength={6} 
+            placeholder="Mật khẩu"
+            {...register("password")}
+            required 
+            />
+            <button type="submit" 
+            className='login-form-submit'
+            >Đăng nhập</button>
+            <p>Chưa có tài khoản<span onClick={()=>route.push('/registration')}>Đăng ký</span></p>
+          </form>
+        </div>
   )
 }

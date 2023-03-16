@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import ReactLoading from 'react-loading'
+const host = 'http://localhost:8080'
 
 export default function New (props) {
   $(document).on('input', 'textarea', function () {

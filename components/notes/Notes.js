@@ -10,8 +10,9 @@ import Edit from './Edit'
 import Cookies from 'universal-cookie'
 import Notification from '../notifcation/Notification'
 import moment from 'moment/moment'
+const host = 'http://localhost:8080'
 
-export default function Notes() {
+export default function Notes () {
   const cookies = new Cookies()
   const tokenUser = cookies.get('tokenUser')
   const [isModalOpen, setIsModalOpen] = useState(true)
@@ -34,11 +35,11 @@ export default function Notes() {
   }
 
   const getNotes = () => {
-    axios.get('http://localhost:8080/demo_01/notes')
+    axios.get(`${host}/demo_01/notes`)
       .then((res) => {
         setNotes(res?.data?._embedded)
       })
-      .catch()
+      .catch((res) => { console.log(res) })
   }
 
   useEffect(() => {
@@ -54,7 +55,7 @@ export default function Notes() {
           {
             label: 'Có',
             onClick: () => {
-              axios.delete(`http://localhost:8080/demo_01/notes/${props?.id}`)
+              axios.delete(`${host}/demo_01/notes/${props?.id}`)
                 .then(() => {
                   toast.success('Xóa thành công')
                   getNotes()
@@ -69,24 +70,29 @@ export default function Notes() {
       })
     }
 
-
-
-    const onChange = (value, dateString) => {
-      console.log('Selected Time: ', value);
-      console.log('Formatted Selected Time: ', dateString);
-    };
-
     const onOk = (value) => {
-      var s = Date.parse(value?.$d)
-      axios.patch(`http://localhost:8080/demo_01/notes/${props?.id}`, {'time': s, 'status': "no" }).then((res) => {
+      const s = Date.parse(value?.$d)
+      axios.patch(`${host}/demo_01/notes/${props?.id}`, { time: s, status: 'no' }).then((res) => {
         toast.success('Thêm mới thành công')
         getNotes()
       }).catch((res) => {
         console.log(res)
       })
-    };
+    }
+
+    const updateColor = (color) => {
+      axios.patch(`${host}/demo_01/notes/${props?.id}`, {
+        color
+      }).then((res) => {
+        getNotes()
+        toast.success('Cập nhật thành công')
+      }).catch((res) => {
+        console.log(res)
+      })
+    }
 
     const [display, setDisplay] = useState(false)
+    const [color, setColor] = useState(false)
     return (
       <div style={{ position: 'relative' }}>
         <div className='note-acction note-acction-hide'>
@@ -95,10 +101,10 @@ export default function Notes() {
               <label>
                 <Icon icon='ic:outline-notification-add' color='#5f6368' width='20' />
                 <p>Nhắc tôi</p>
-                <DatePicker showTime onChange={onChange} onOk={onOk} className='datePicker' />
+                <DatePicker showTime onOk={onOk} className='datePicker' />
               </label>
             </div>
-            <div className='note-acction-info centered'>
+            <div className='note-acction-info centered' onClick={() => { setColor(current => !current) }}>
               <Icon icon='ic:outline-color-lens' color='#5f6368' width='20' />
               <p>màu sắc</p>
             </div>
@@ -112,6 +118,16 @@ export default function Notes() {
             </div>
           </Space>
           <div />
+        </div>
+        <div className={color ? 'show' : 'hide'}>
+          <div className='acction-color'>
+            <div className='acction-color-item' style={{ background: '#ffff' }} onClick={() => { updateColor('#ffff') }} />
+            <div className='acction-color-item' style={{ background: '#F28B82' }} onClick={() => { updateColor('#F28B82') }} />
+            <div className='acction-color-item' style={{ background: '#FFF475' }} onClick={() => { updateColor('#FFF475') }} />
+            <div className='acction-color-item' style={{ background: '#FFF475' }} onClick={() => { updateColor('#FFF475') }} />
+            <div className='acction-color-item' style={{ background: '#AECBFA' }} onClick={() => { updateColor('#AECBFA') }} />
+            <div className='acction-color-item' style={{ background: '#D7AEFB' }} onClick={() => { updateColor('#D7AEFB') }} />
+          </div>
         </div>
         <div className={display ? 'show' : 'hide'}>
           <div className='acction-info'>
@@ -130,23 +146,27 @@ export default function Notes() {
     return (
       (notes || []).map((item) => {
         if (item?.idUser === tokenUser) {
-            var now = moment(parseInt(item?.time?.$numberLong)).format('L LT');
-          const RenderTime=()=>{
-            if(item?.status=='yes') 
-            return <div className='clock'>
-              <Icon icon="ic:round-access-time" color="#afafaf" width="20" />
-              <p style={{textDecoration:'line-through'}}>{now}</p>
-            </div>
-            else if(item?.status=='no')
-            return <div className='clock'>
-              <Icon icon="ic:round-access-time" color="#afafaf" width="20" />
-              <p>{now}</p>
-            </div>
-            else return <></>
+          const now = moment(parseInt(item?.time?.$numberLong)).format('L LT')
+          const RenderTime = () => {
+            if (item?.status == 'yes') {
+              return (
+                <div className='clock'>
+                  <Icon icon='ic:round-access-time' color='#afafaf' width='20' />
+                  <p style={{ textDecoration: 'line-through' }}>{now}</p>
+                </div>
+              )
+            } else if (item?.status == 'no') {
+              return (
+                <div className='clock'>
+                  <Icon icon='ic:round-access-time' color='#afafaf' width='20' />
+                  <p>{now}</p>
+                </div>
+              )
+            } else return <></>
           }
           return (
             <div key={item._id?.$oid}>
-              <div className='note-item'>
+              <div className='note-item' style={{ background: item?.color }}>
                 <div onClick={() => { setIsModalOpen(false); setId(item._id?.$oid) }}>
                   <div className='note-item-img'>
                     <img src={item?.image} />
@@ -155,7 +175,7 @@ export default function Notes() {
                     <p className='note-info-title'>{item?.title}</p>
                     <p>{item?.description}</p>
                   </div>
-                   <RenderTime />
+                  <RenderTime />
                 </div>
                 <Renderaction id={item?._id?.$oid} />
               </div>
@@ -172,7 +192,7 @@ export default function Notes() {
   }
 
   return (
-    <>
+    <div className='note-container'>
       <div className={display ? 'show' : 'hide'}>
         <Row justify='center'>
           <Col md={12} sm={16} xs={23} className='note-add new'>
@@ -200,10 +220,10 @@ export default function Notes() {
       {/* {renderNotifi()} */}
       <Row>
         <Col className='noti' span={12}>
-            <Notification noti={notes} parentCallback={callNoti} />
+          <Notification noti={notes} parentCallback={callNoti} />
         </Col>
       </Row>
 
-    </>
+    </div>
   )
 }

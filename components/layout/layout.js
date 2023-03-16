@@ -1,5 +1,5 @@
 import { Col, Row, Space } from 'antd'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Icon } from '@iconify/react'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
@@ -11,15 +11,21 @@ export default function layout (props) {
   const router = useRouter()
   const cookies = new Cookies()
   const tokenUser = cookies.get('tokenUser')
+  const [display, setDisplay] = useState(false)
+  const handleClick = event => {
+    setDisplay(current => !current)
+  }
 
   const getUser = () => {
+    if(tokenUser){
     axios.get(`http://localhost:8080/demo_01/user/${tokenUser}`)
       .then((res) => {
         console.log(res)
       })
-      .catch((error)=>{
+      .catch((error) => {
         console.log(error)
       })
+    }
   }
 
   useEffect(() => {
@@ -44,7 +50,7 @@ export default function layout (props) {
       <Row className='header' align='middle'>
         <Col span={6} className='header-item'>
           <Space>
-            <div className='menu-btn'>
+            <div className='menu-btn' onClick={handleClick}>
               <Icon icon='material-symbols:menu' color='#5F6368' width='25' />
             </div>
             <Icon icon='logos:google-keep' color='#333' width='30' />
@@ -67,7 +73,7 @@ export default function layout (props) {
       <Row>
         <Col>
           <div className='sidebar'>
-            <ul>
+            <ul className={display ? 'sidebar-hide' : ''}>
               <li onClick={() => { router.push('/') }} className={router.asPath === '/' ? 'sidebar-click' : ''}>
                 <Space>
                   <div className='sidebar-item'>

@@ -7,7 +7,7 @@ const host = 'http://localhost:8080'
 import { useForm } from "react-hook-form";
 import { toast } from 'react-toastify'  
 
-export default function Registration() {
+export default function test2() {
   const [user,setUser] = useState();
   const route = useRouter()
   const { register, handleSubmit } = useForm();
@@ -57,8 +57,8 @@ export default function Registration() {
   }
 
   return (
-        <div className='login'>
-          <form className='login-form' onSubmit={handleSubmit(onSubmit)}>
+        <div className='test'>
+          <form className='test-form' onSubmit={handleSubmit(onSubmit)}>
             <h3 className="text-center">Đăng kí tài khoản</h3>
             <p>Tên tài khoản</p>
             <input type="text"
@@ -82,7 +82,7 @@ export default function Registration() {
             required 
             />
             <button type="submit" 
-            className='login-form-submit'
+            className='test-form-submit'
             >Tạo tài khoản</button>
             <p>Đã có tài khoản<span onClick={()=>route.push('/login')}>Đăng nhập</span></p>
           </form>
