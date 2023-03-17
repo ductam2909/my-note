@@ -22,7 +22,6 @@ export default function Notification (props) {
 
   const updateStatus = (id) => {
     axios.patch(`http://localhost:8080/demo_01/notes/${id}`, { status: 'yes' }).then((res) => {
-      toast.success('up date thành công')
       getNotifi()
     }).catch((res) => {
       console.log(res)
@@ -48,17 +47,16 @@ export default function Notification (props) {
     )
   }
 
-  const renderNote = () => {
+   const renderNote = () => {
     return (
       
-      (props?.noti || []).map((item) => {
+      (props?.noti || []).filter(person => person.status === 'no').map((item) => {
         const s = item?.time?.$numberLong - Date?.now()
         const renderer = ({ hours, minutes, seconds, completed }) => {
           if (completed) {
-            if (item?.status === 'no') {
-              return <Completionist id={item._id?.$oid} />
-            } else if (item?.status === 'yes') return <></>
-          } else {
+            return <Completionist id={item._id?.$oid} />
+          } 
+          else {
             return (
               <>
                 <p>Thông báo</p>
