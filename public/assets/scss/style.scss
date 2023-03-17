@@ -576,4 +576,17 @@ body {}
 }
 
 .form-group {
+
+}
+
+@media screen and (max-width: 600px) {
+.sidebar {
+  display: none;
+}
+.ant-col {
+  padding-left: 0 !important;
+}
+.react-confirm-alert-body {
+  width: auto !important;
+}
 }
