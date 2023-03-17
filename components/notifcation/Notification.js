@@ -54,7 +54,7 @@ export default function Notification (props) {
         const s = item?.time?.$numberLong - Date?.now()
         const renderer = ({ hours, minutes, seconds, completed }) => {
           if (completed) {
-            return <Completionist id={item._id?.$oid} />
+            return <Completionist id={item?.id} />
           } 
           else {
             return (
@@ -66,7 +66,7 @@ export default function Notification (props) {
           }
         }
         return (
-          <div key={item._id?.$oid}>
+          <div key={item?.id}>
             {item?.time && <Countdown
               date={s + Date.now()}
               renderer={renderer}

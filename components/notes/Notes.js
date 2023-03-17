@@ -10,7 +10,8 @@ import Edit from './Edit'
 import Cookies from 'universal-cookie'
 import Notification from '../notifcation/Notification'
 import moment from 'moment/moment'
-const host = 'http://localhost:8080'
+// const host = 'http://localhost:8080'
+const host ='https://6414110850dff8e8fe442305.mockapi.io'
 
 export default function Notes () {
   const cookies = new Cookies()
@@ -35,9 +36,9 @@ export default function Notes () {
   }
 
   const getNotes = () => {
-    axios.get(`${host}/demo_01/notes`)
+    axios.get(`${host}/notes`)
       .then((res) => {
-        setNotes(res?.data?._embedded)
+        setNotes(res?.data)
       })
       .catch((res) => { console.log(res) })
   }
@@ -55,7 +56,7 @@ export default function Notes () {
           {
             label: 'Có',
             onClick: () => {
-              axios.delete(`${host}/demo_01/notes/${props?.id}`)
+              axios.delete(`${host}/notes/${props?.id}`)
                 .then(() => {
                   toast.success('Xóa thành công')
                   getNotes()
@@ -72,7 +73,7 @@ export default function Notes () {
 
     const onOk = (value) => {
       const s = Date.parse(value?.$d)
-      axios.patch(`${host}/demo_01/notes/${props?.id}`, { time: s, status: 'no' }).then((res) => {
+      axios.put(`${host}/notes/${props?.id}`, { time: s, status: 'no' }).then((res) => {
         toast.success('Thêm mới thành công')
         getNotes()
       }).catch((res) => {
@@ -81,7 +82,7 @@ export default function Notes () {
     }
 
     const updateColor = (color) => {
-      axios.patch(`${host}/demo_01/notes/${props?.id}`, {
+      axios.put(`${host}/notes/${props?.id}`, {
         color
       }).then((res) => {
         getNotes()
@@ -165,9 +166,9 @@ export default function Notes () {
             } else return <></>
           }
           return (
-            <div key={item._id?.$oid}>
+            <div key={item.id}>
               <div className='note-item' style={{ background: item?.color }}>
-                <div onClick={() => { setIsModalOpen(false); setId(item._id?.$oid) }}>
+                <div onClick={() => { setIsModalOpen(false); setId(item?.id) }}>
                   <div className='note-item-img'>
                     <img src={item?.image} />
                   </div>
@@ -177,7 +178,7 @@ export default function Notes () {
                   </div>
                   <RenderTime />
                 </div>
-                <Renderaction id={item?._id?.$oid} />
+                <Renderaction id={item?.id} />
               </div>
             </div>
           )

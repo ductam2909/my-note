@@ -3,7 +3,8 @@ import { post } from 'jquery'
 import { useRouter } from 'next/router'
 import React, { use } from 'react'
 import { useEffect, useState } from 'react'
-const host = 'http://localhost:8080'
+// const host = 'http://localhost:8080'
+const host ='https://6414110850dff8e8fe442305.mockapi.io'
 import { useForm } from "react-hook-form";
 import { toast } from 'react-toastify'  
 import Cookies from 'universal-cookie'
@@ -21,7 +22,7 @@ export default function Login() {
     else {
     s.map((s)=>{
      if(data?.password===s?.password) {
-      cookies.set('tokenUser', s._id?.$oid, { path: '/' })
+      cookies.set('tokenUser', s?.id, { path: '/' })
       route.push('/')
       toast.success('Đăng nhập thành công')
      }
@@ -31,10 +32,9 @@ export default function Login() {
   }
 
   const getUser = () => {
-    axios.get(`${host}/demo_01/user`).
+    axios.get(`${host}/user`).
     then((res)=>{
-      console.log(res?.data?._embedded);
-      setUser(res?.data?._embedded)
+      setUser(res?.data)
     })
   }
 

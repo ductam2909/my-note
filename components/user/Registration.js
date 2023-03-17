@@ -3,7 +3,8 @@ import { post } from 'jquery'
 import { useRouter } from 'next/router'
 import React, { use } from 'react'
 import { useEffect, useState } from 'react'
-const host = 'http://localhost:8080'
+// const host = 'http://localhost:8080'
+const host ='https://6414110850dff8e8fe442305.mockapi.io'
 import { useForm } from "react-hook-form";
 import { toast } from 'react-toastify'  
 
@@ -14,7 +15,7 @@ export default function Registration() {
   const onSubmit = data => {
     const s = user?.filter((item)=>item?.email===data?.email)
     if(s.length===0){
-      axios.post(`${host}/demo_01/user`,{
+      axios.post(`${host}/user`,{
         'username':data?.username,
         'email':data?.email,
         'password':data?.password
@@ -33,10 +34,10 @@ export default function Registration() {
   }
 
   const getUser = () => {
-    axios.get(`${host}/demo_01/user`).
+    axios.get(`${host}/user`).
     then((res)=>{
-      console.log(res?.data?._embedded);
-      setUser(res?.data?._embedded)
+      console.log(res?.data);
+      setUser(res?.data)
     })
   }
 

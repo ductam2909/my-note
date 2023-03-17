@@ -6,7 +6,8 @@ import { useForm } from 'react-hook-form'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import ReactLoading from 'react-loading'
-const host = 'http://localhost:8080'
+// const host = 'http://localhost:8080'
+const host ='https://6414110850dff8e8fe442305.mockapi.io'
 
 export default function New (props) {
   $(document).on('input', 'textarea', function () {
@@ -21,7 +22,7 @@ export default function New (props) {
   const [idUser, setidUser] = useState(props?.token)
   const onSubmit = data => {
     const obj = Object.assign({}, data, { image }, { idUser })
-    axios.post('http://localhost:8080/demo_01/notes', obj).then((res) => {
+    axios.post(`${host}/notes`, obj).then((res) => {
       toast.success('Thêm mới thành công')
       closeForm()
     }).catch((res) => {

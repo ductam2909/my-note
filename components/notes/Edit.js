@@ -4,7 +4,8 @@ import { Icon } from '@iconify/react'
 import axios from 'axios'
 import ReactLoading from 'react-loading'
 import { toast } from 'react-toastify'
-const host = 'http://localhost:8080'
+// const host = 'http://localhost:8080'
+const host ='https://6414110850dff8e8fe442305.mockapi.io'
 
 export default function Edit (props) {
   const [loading, setLoading] = useState(false)
@@ -19,7 +20,7 @@ export default function Edit (props) {
   }
 
   const getNotes = () => {
-    axios.get(`${host}/demo_01/notes/${props?.ids}`)
+    axios.get(`${host}/notes/${props?.ids}`)
       .then((res) => {
         console.log('Vào đây ', res?.data)
         setNotes(res?.data)
@@ -31,7 +32,7 @@ export default function Edit (props) {
   const [image, setImage] = useState()
 
   const updateNote = () => {
-    axios.patch(`${host}/demo_01/notes/${props?.ids}`, {
+    axios.put(`${host}/notes/${props?.ids}`, {
       ...notes,
       image
     }).then((res) => {
@@ -45,7 +46,7 @@ export default function Edit (props) {
 
   const updateColor = (color) => {
     console.log('color', color)
-    axios.patch(`${host}/demo_01/notes/${props?.ids}`, {
+    axios.put(`${host}/notes/${props?.ids}`, {
       color
     }).then((res) => {
       getNotes()

@@ -15,10 +15,10 @@ export default function layout (props) {
   const handleClick = event => {
     setDisplay(current => !current)
   }
-
+  const host ='https://6414110850dff8e8fe442305.mockapi.io'
   const getUser = () => {
     if(tokenUser){
-    axios.get(`http://localhost:8080/demo_01/user/${tokenUser}`)
+    axios.get(`${host}/user/${tokenUser}`)
       .then((res) => {
         console.log(res)
       })
