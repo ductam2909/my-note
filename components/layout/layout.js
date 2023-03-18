@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import Cookies from 'universal-cookie'
 import axios from 'axios'
 
-export default function layout (props) {
+export default function layout(props) {
   const router = useRouter()
   const cookies = new Cookies()
   const tokenUser = cookies.get('tokenUser')
@@ -17,14 +17,14 @@ export default function layout (props) {
   }
 
   const getUser = () => {
-    if(tokenUser){
-    axios.get(`http://localhost:8080/demo_01/user/${tokenUser}`)
-      .then((res) => {
-        console.log(res)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+    if (tokenUser) {
+      axios.get(`http://localhost:8080/demo_01/user/${tokenUser}`)
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     }
   }
 

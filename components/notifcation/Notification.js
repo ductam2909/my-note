@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Countdown from 'react-countdown'
 import axios from 'axios'
-import { toast } from 'react-toastify'
-import AOS from 'aos'
 import { Icon } from '@iconify/react'
 import Edit from '../notes/Edit'
 
@@ -27,9 +25,7 @@ export default function Notification (props) {
       console.log(res)
     })
   }
-
   const [id, setId] = useState()
-
   const [isModalOpen, setIsModalOpen] = useState(true)
   const handleOk = (data) => {
     setIsModalOpen(data)
@@ -59,7 +55,7 @@ export default function Notification (props) {
           else {
             return (
               <>
-                <p>Thông báo</p>
+                {/* <p>Thông báo</p> */}
                 <span>{hours}:{minutes}:{seconds}</span>
               </>
             )
@@ -69,8 +65,8 @@ export default function Notification (props) {
           <div key={item._id?.$oid}>
             {item?.time && <Countdown
               date={s + Date.now()}
-              renderer={renderer}
-                           />}
+              renderer={renderer}/>
+            }
           </div>
         )
       })

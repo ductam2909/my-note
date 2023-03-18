@@ -10,6 +10,7 @@ export default function Edit (props) {
   const [loading, setLoading] = useState(false)
   const [color, setColor] = useState()
   const [display, setDisplay] = useState()
+  const [image, setImage] = useState()
   const [notes, setNotes] = useState({
     title: '',
     description: ''
@@ -27,8 +28,6 @@ export default function Edit (props) {
       })
       .catch()
   }
-
-  const [image, setImage] = useState()
 
   const updateNote = () => {
     axios.patch(`${host}/demo_01/notes/${props?.ids}`, {
@@ -140,6 +139,5 @@ export default function Edit (props) {
         </Modal>
       </Col>
     </Row>
-
   )
 }

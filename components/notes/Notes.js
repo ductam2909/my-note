@@ -11,8 +11,9 @@ import Cookies from 'universal-cookie'
 import Notification from '../notifcation/Notification'
 import moment from 'moment/moment'
 const host = 'http://localhost:8080'
+import ReactPaginate from 'react-paginate'
 
-export default function Notes () {
+export default function Notes() {
   const cookies = new Cookies()
   const tokenUser = cookies.get('tokenUser')
   const [isModalOpen, setIsModalOpen] = useState(true)
@@ -30,6 +31,7 @@ export default function Notes () {
     700: 2,
     500: 1
   }
+  
   const callNoti = (childData) => {
     setNotes(childData)
   }
@@ -142,53 +144,92 @@ export default function Notes () {
     )
   }
 
-  const renderNote = () => {
-    return (
-      (notes || []).map((item) => {
-        if (item?.idUser === tokenUser) {
-          const now = moment(parseInt(item?.time?.$numberLong)).format('L LT')
-          const RenderTime = () => {
-            if (item?.status == 'yes') {
-              return (
-                <div className='clock'>
-                  <Icon icon='ic:round-access-time' color='#afafaf' width='20' />
-                  <p style={{ textDecoration: 'line-through' }}>{now}</p>
-                </div>
-              )
-            } else if (item?.status == 'no') {
-              return (
-                <div className='clock'>
-                  <Icon icon='ic:round-access-time' color='#afafaf' width='20' />
-                  <p>{now}</p>
-                </div>
-              )
-            } else return <></>
-          }
-          return (
-            <div key={item._id?.$oid}>
-              <div className='note-item' style={{ background: item?.color }}>
-                <div onClick={() => { setIsModalOpen(false); setId(item._id?.$oid) }}>
-                  <div className='note-item-img'>
-                    <img src={item?.image} />
-                  </div>
-                  <div className='note-info'>
-                    <p className='note-info-title'>{item?.title}</p>
-                    <p>{item?.description}</p>
-                  </div>
-                  <RenderTime />
-                </div>
-                <Renderaction id={item?._id?.$oid} />
-              </div>
-            </div>
-          )
-        }
-      })
-    )
-  }
   const [display, setDisplay] = useState(true)
   const callbackFunction = (childData) => {
     setDisplay(childData)
     getNotes()
+  }
+
+  function Items({ currentItems }) {
+    return (
+      <Masonry
+        breakpointCols={breakpointColumnsObj}
+        className='my-masonry-grid'
+        columnClassName='my-masonry-grid_column'
+        data-aos='zoom-in-up'
+      >
+        {currentItems &&
+          currentItems.map((item) => {
+            if (item?.idUser === tokenUser) {
+              const now = moment(parseInt(item?.time?.$numberLong)).format('L LT')
+              const RenderTime = () => {
+                if (item?.status == 'yes') {
+                  return (
+                    <div className='clock'>
+                      <Icon icon='ic:round-access-time' color='#afafaf' width='20' />
+                      <p style={{ textDecoration: 'line-through' }}>{now}</p>
+                    </div>
+                  )
+                } else if (item?.status == 'no') {
+                  return (
+                    <div className='clock'>
+                      <Icon icon='ic:round-access-time' color='#afafaf' width='20' />
+                      <p>{now}</p>
+                    </div>
+                  )
+                } else return <></>
+              }
+              return (
+                <div key={item._id?.$oid}>
+                  <div className='note-item' style={{ background: item?.color }}>
+                    <div onClick={() => { setIsModalOpen(false); setId(item._id?.$oid) }}>
+                      <div className='note-item-img'>
+                        <img src={item?.image} />
+                      </div>
+                      <div className='note-info'>
+                        <p className='note-info-title'>{item?.title}</p>
+                        <p>{item?.description}</p>
+                      </div>
+                      <RenderTime />
+                    </div>
+                    <Renderaction id={item?._id?.$oid} />
+                  </div>
+                </div>
+              )
+            }
+          })}
+      </Masonry>
+    )
+  }
+
+  function PaginatedItems({ itemsPerPage }) {
+    const [itemOffset, setItemOffset] = useState(0)
+    const endOffset = itemOffset + itemsPerPage
+    const currentItems = notes?.slice(itemOffset, endOffset)
+    const pageCount = Math.ceil(notes?.length / itemsPerPage)
+
+    const handlePageClick = (event) => {
+      const newOffset = (event.selected * itemsPerPage) % notes?.length
+      setItemOffset(newOffset)
+    }
+    return (
+      <>
+        <div className='tour__container'>
+          <Items currentItems={currentItems} />
+        </div>
+        <ReactPaginate
+          breakLabel='...'
+          className='paginate--custom'
+          nextLabel='>'
+          onPageChange={handlePageClick}
+          pageRangeDisplayed={5}
+          pageCount={pageCount}
+          previousLabel='<'
+          renderOnZeroPageCount={null}
+        />
+
+      </>
+    )
   }
 
   return (
@@ -207,23 +248,14 @@ export default function Notes () {
       </div>
       {!display && <New Callback={callbackFunction} token={tokenUser} />}
       <div className='content'>
-        <Masonry
-          breakpointCols={breakpointColumnsObj}
-          className='my-masonry-grid'
-          columnClassName='my-masonry-grid_column'
-          data-aos='zoom-in-up'
-        >
-          {renderNote()}
-        </Masonry>
+        <PaginatedItems itemsPerPage={10} />
         {!isModalOpen && <Edit Callback={handleOk} ids={id} />}
       </div>
-      {/* {renderNotifi()} */}
       <Row>
         <Col className='noti' span={12}>
           <Notification noti={notes} parentCallback={callNoti} />
         </Col>
       </Row>
-
     </div>
   )
 }
